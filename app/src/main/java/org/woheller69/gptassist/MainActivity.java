@@ -72,7 +72,9 @@ public class MainActivity extends Activity {
     private String urlToLoad = "https://my.irancell.ir/";
     private static boolean restricted = true;
     private long lastBackPressTime = 0;
-    private static final int EXIT_INTERVAL = 2000; // 2 seconds
+    private boolean backKeyDown = false;
+    private long backKeyDownTime = 0;
+    private static final int LONG_PRESS_THRESHOLD = 1500; // ms
 
     private static final ArrayList<String> allowedDomains = new ArrayList<String>();
 
@@ -284,24 +286,6 @@ public class MainActivity extends Activity {
             assert dm != null;
             dm.enqueue(request);
         });
-        
-        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                if (chatWebView.canGoBack()) {
-                    chatWebView.goBack();
-                    return;
-                }
-        
-                long now = System.currentTimeMillis();
-                if (now - lastBackPressTime < EXIT_INTERVAL) {
-                    finishAffinity(); // finish(); or finishAffinity() to close all activities
-                } else {
-                    lastBackPressTime = now;
-                    Toast.makeText(MainActivity.this, "Press back again to exit", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
 
         //Set more options
         chatWebSettings = chatWebView.getSettings();
@@ -470,6 +454,52 @@ public class MainActivity extends Activity {
                 Toast.makeText(context, "Storage permission denied.", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            backKeyDown = true;
+            backKeyDownTime = System.currentTimeMillis();
+            return true; // we handle it
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK && backKeyDown) {
+            backKeyDown = false;
+    
+            long pressDuration = System.currentTimeMillis() - backKeyDownTime;
+    
+            // Long press detected → kill app completely
+            if (pressDuration > LONG_PRESS_THRESHOLD) {
+                finishAffinity();   // close all activities
+                System.exit(0);     // fully kill process
+                return true;
+            }
+    
+            // Normal back tap
+            if (chatWebView.canGoBack()) {
+                chatWebView.goBack();
+                return true;
+            }
+    
+            // Double-tap to exit
+            long now = System.currentTimeMillis();
+            if (now - lastBackPressTime < 1500) {
+                finishAffinity();
+                System.exit(0);
+            } else {
+                Toast.makeText(this, "Press back again to exit", Toast.LENGTH_SHORT).show();
+                lastBackPressTime = now;
+            }
+    
+            return true;
+        }
+    
+        return super.onKeyUp(keyCode, event);
     }
 
 }
