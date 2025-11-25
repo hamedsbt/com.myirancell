@@ -71,6 +71,8 @@ public class MainActivity extends Activity {
     private String TAG ="gptAssist";
     private String urlToLoad = "https://my.irancell.ir/";
     private static boolean restricted = true;
+    private long lastBackPressTime = 0;
+    private static final int EXIT_INTERVAL = 2000; // 2 seconds
 
     private static final ArrayList<String> allowedDomains = new ArrayList<String>();
 
@@ -282,6 +284,24 @@ public class MainActivity extends Activity {
             assert dm != null;
             dm.enqueue(request);
         });
+        
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (chatWebView.canGoBack()) {
+                    chatWebView.goBack();
+                    return;
+                }
+        
+                long now = System.currentTimeMillis();
+                if (now - lastBackPressTime < EXIT_INTERVAL) {
+                    finishAffinity(); // finish(); or finishAffinity() to close all activities
+                } else {
+                    lastBackPressTime = now;
+                    Toast.makeText(MainActivity.this, "Press back again to exit", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
 
         //Set more options
         chatWebSettings = chatWebView.getSettings();
@@ -308,22 +328,15 @@ public class MainActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
     }
-
+    
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        //Credit (CC BY-SA 3.0): https://stackoverflow.com/a/6077173
-        if (event.getAction() == KeyEvent.ACTION_DOWN) {
-            switch (keyCode) {
-                case KeyEvent.KEYCODE_BACK:
-                    if (chatWebView.canGoBack() && !chatWebView.getUrl().equals("about:blank")) {
-                        chatWebView.goBack();
-                    } else {
-                        finish();
-                    }
-                    return true;
-            }
+    public boolean onKeyLongPress(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            // Kill immediately on long press
+            finishAffinity();   // kills entire task
+            return true;
         }
-        return super.onKeyDown(keyCode, event);
+        return super.onKeyLongPress(keyCode, event);
     }
 
     public void resetChat()  {
