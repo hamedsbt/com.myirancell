@@ -25,6 +25,9 @@ myIrancellAssist is a simple WebView wrapper for myIrancell (Irancell Telecommun
 You can switch on/off blocking by clicking the button at the top right.
 Swipe up a bit to hide the button.
 
+## IMPORTANT NOTE
+This app has package name com.myirancell as same as official myIrancell and it will not over-install. 
+
 ## License
 
 This app is licensed under the GPLv3.
