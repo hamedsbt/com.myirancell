@@ -343,7 +343,7 @@ public class MainActivity extends Activity {
         //Allowed Domains
         allowedDomains.add("irancell.ir");
         allowedDomains.add("googleapis.com");
-        allowedDomains.add("www.cloudflare.com");
+        allowedDomains.add("cloudflare.com");
         //allowedDomains.add("my.irancell.ir");
 
     }
