@@ -18,7 +18,7 @@ Or via this link (with fees)
 myIrancellAssist is a simple WebView wrapper for myIrancell (Irancell Telecommunication Services Company (MTN Irancell) – Iran's 2nd mobile operator). It blocks all URLs which are not essential.
 
 - 🔒 **Privacy-focused**: Blocks unnecessary URLs, tracking and Permission are removed
-- 🎯 **Focused interface**: Clean chat experience without browser distractions  
+- 🎯 **Focused interface**: Clean app experience without browser distractions  
 - 🔄 **Toggle blocking**: Switch between restricted and unrestricted modes
 - 📱 **Lightweight**: Minimal app focused on core functionality
 
